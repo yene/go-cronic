@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"crypto/tls"
+	"flag"
 	"io/ioutil"
 	"log"
 	"os"
@@ -42,10 +43,14 @@ type ConfigMail struct {
 	Subject  string `toml:"subject"`
 }
 
-var configPath = "~/.config/chronic/chronic.conf"
+var defaultConfigPath = "~/.config/chronic/chronic.conf"
 
 func main() {
-	args := os.Args[1:]
+	configPathPtr := flag.String("c", defaultConfigPath, "Path to config")
+	flag.Parse()
+	configPath := *configPathPtr
+
+	args := flag.Args()
 	if len(args) == 0 {
 		log.Fatalln("Require a command")
 	}
