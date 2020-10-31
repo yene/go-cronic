@@ -12,8 +12,10 @@ vim ~/.config/chronic/chronic.conf
 
 # or set new path with -c
 ./cronic -c ./path/chronic.conf echo "hello world"
-
 ```
+
+> To change mail template or subject modify the code.
+
 
 ## Releae
 `cronic` in this repo is the binary for linux
@@ -21,11 +23,11 @@ vim ~/.config/chronic/chronic.conf
 ## Features and Todo
 - [x] Send stderr per mail
 - [x] Consume TOML config
-- [ ] Inform if a script is not executable (chmod +x)
 - [x] Take path to config from flag
-- [ ] Option for TLS/SSL/none
-- [ ] Option to always send stout
+- [x] Option for TLS/SSL/none
+- [x] Option to always send stdout
 - [ ] Forward stdout/stderr to parent
+- [ ] Inform if a script is not executable (chmod +x)
 
 ## Inspiration
 * https://habilis.net/cronic/

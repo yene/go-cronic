@@ -1,7 +1,7 @@
 package main
 
 func mailTemplate() string {
-	return `Cronic detected failure or error output for the command:
+	return `Cronic output for the command:
 {{.Command}}
 
 RESULT CODE: {{.ResultCode}}

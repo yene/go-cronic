@@ -41,7 +41,8 @@ type ConfigSMTP struct {
 type ConfigMail struct {
 	Sender   string `toml:"sender"`
 	Receiver string `toml:"receiver"`
-	Subject  string `toml:"subject"`
+	//Subject    string `toml:"subject"`
+	Sendstdout bool `toml:"sendstdout"`
 }
 
 var defaultConfigPath = "~/.config/chronic/chronic.conf"
@@ -76,7 +77,9 @@ func main() {
 		exitCode = exitError.ExitCode()
 	} else {
 		log.Println("no error")
-		os.Exit(0)
+		if config.Mail.Sendstdout == false {
+			os.Exit(0)
+		}
 	}
 
 	data := TemplateVariables{
@@ -110,13 +113,18 @@ func main() {
 
 	sus := commandString
 	if len(sus) > 25 {
-		sus = sus[0:25]
+		sus = sus[0:22] + "..."
+	}
+
+	subject := "Cronic error for: "
+	if exitCode == 0 {
+		subject = "Cronic success for: "
 	}
 
 	email := mail.NewMSG()
 	email.SetFrom("Cronic <" + config.Mail.Sender + ">").
 		AddTo(config.Mail.Receiver).
-		SetSubject(config.Mail.Subject + sus)
+		SetSubject(subject + sus)
 
 	email.SetBody(mail.TextPlain, htmlBody)
 	err = email.Send(smtpClient)
