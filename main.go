@@ -31,10 +31,11 @@ type TomlConfig struct {
 }
 
 type ConfigSMTP struct {
-	Host     string `toml:"host"`
-	Port     int    `toml:"port"`
-	Username string `toml:"username"`
-	Password string `toml:"password"`
+	Host       string `toml:"host"`
+	Port       int    `toml:"port"`
+	Encryption string `toml:"encryption"`
+	Username   string `toml:"username"`
+	Password   string `toml:"password"`
 }
 
 type ConfigMail struct {
@@ -100,7 +101,7 @@ func main() {
 	server.Port = config.Smtp.Port
 	server.Username = config.Smtp.Username
 	server.Password = config.Smtp.Password
-	server.Encryption = mail.EncryptionSSL
+	server.Encryption = convertEncryption(config.Smtp.Encryption)
 	server.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 	smtpClient, err := server.Connect()
 	if err != nil {
@@ -135,4 +136,14 @@ func expandTilde(path string) string {
 		}
 	}
 	return path
+}
+
+func convertEncryption(enc string) mail.Encryption {
+	if enc == "SSL" {
+		return mail.EncryptionSSL
+	} else if enc == "TLS" {
+		return mail.EncryptionTLS
+	} else {
+		return mail.EncryptionNone
+	}
 }
