@@ -1,6 +1,11 @@
 # Go Chronic
-From `0 1 * * * backup >/dev/null 2>&1`
-To `0 1 * * * cronic backup`
+Chronic runs the given command and sends the error output per SMTP mail. If you configure `sendstdout=true` in chronic.conf it also sends a mail on success.
+
+From `0 1 * * * backup_cmd >/dev/null 2>&1`
+
+To `0 1 * * * cronic backup_cmd`
+
+
 
 ![screenshot](shot.png)
 
