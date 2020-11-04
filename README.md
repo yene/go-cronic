@@ -10,6 +10,8 @@ To `0 1 * * * cronic backup_cmd`
 ![screenshot](shot.png)
 
 ## Configuration
+Uses the [TOML format](https://toml.io/en/)
+
 ```bash
 mkdir -p ~/.config/chronic/
 cp chronic.conf ~/.config/chronic/chronic.conf
@@ -19,7 +21,21 @@ vim ~/.config/chronic/chronic.conf
 ./cronic -c ./path/chronic.conf echo "hello world"
 ```
 
-> To change mail template or subject modify the code.
+## Subject and Boady Template
+Example on how to change them:
+```toml
+subject="custom subject"
+template="""
+The command had a problem:
+{{.Command}}
+RESULT CODE: {{.ResultCode}}
+ERROR OUTPUT:
+{{.ErrorOutput}}
+STANDARD OUTPUT:
+{{.StandardOutput}}
+"""
+
+```
 
 
 ## Releae

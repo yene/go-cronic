@@ -1,6 +1,6 @@
 package main
 
-func mailTemplate() string {
+func defaultMailTemplate() string {
 	return `Cronic output for the command:
 {{.Command}}
 

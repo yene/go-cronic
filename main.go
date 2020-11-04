@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"flag"
+	"html/template"
 	"io/ioutil"
 	"log"
 	"os"
@@ -11,7 +12,6 @@ import (
 	"os/user"
 	"path/filepath"
 	"strings"
-	"text/template"
 
 	"github.com/naoina/toml"
 	mail "github.com/xhit/go-simple-mail"
@@ -42,7 +42,9 @@ type ConfigMail struct {
 	Sender   string `toml:"sender"`
 	Receiver string `toml:"receiver"`
 	//Subject    string `toml:"subject"`
-	Sendstdout bool `toml:"sendstdout"`
+	Sendstdout bool   `toml:"sendstdout"`
+	Subject    string `toml:"subject"`
+	Template   string `toml:"template"`
 }
 
 var defaultConfigPath = "~/.config/chronic/chronic.conf"
@@ -91,7 +93,13 @@ func main() {
 	}
 
 	var tpl bytes.Buffer
-	t := template.Must(template.New("html-tmpl").Parse(mailTemplate()))
+
+	mailTemplate := config.Mail.Template
+	if mailTemplate == "" {
+		mailTemplate = defaultMailTemplate()
+	}
+
+	t := template.Must(template.New("html-tmpl").Parse(mailTemplate))
 	err = t.Execute(&tpl, data)
 	if err != nil {
 		log.Fatalln(err)
@@ -115,16 +123,20 @@ func main() {
 	if len(sus) > 25 {
 		sus = sus[0:22] + "..."
 	}
-
 	subject := "Cronic error for: "
 	if exitCode == 0 {
 		subject = "Cronic success for: "
+	}
+	subject = subject + sus
+
+	if config.Mail.Subject != "" {
+		subject = config.Mail.Subject
 	}
 
 	email := mail.NewMSG()
 	email.SetFrom("Cronic <" + config.Mail.Sender + ">").
 		AddTo(config.Mail.Receiver).
-		SetSubject(subject + sus)
+		SetSubject(subject)
 
 	email.SetBody(mail.TextPlain, htmlBody)
 	err = email.Send(smtpClient)
