@@ -47,7 +47,7 @@ type ConfigMail struct {
 	Template   string `toml:"template"`
 }
 
-var defaultConfigPath = "~/.config/chronic/chronic.conf"
+var defaultConfigPath = "~/.config/cronic/cronic.conf"
 
 func main() {
 	configPathPtr := flag.String("c", defaultConfigPath, "Path to config")

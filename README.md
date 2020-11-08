@@ -1,5 +1,5 @@
-# Go Chronic
-Chronic runs the given command and sends the error output per SMTP mail. If you configure `sendstdout=true` in chronic.conf it also sends a mail on success.
+# Go Chonic
+Cronic runs the given command and sends the error output per SMTP mail. If you configure `sendstdout=true` in cronic.conf it also sends a mail on success.
 
 From `0 1 * * * backup_cmd >/dev/null 2>&1`
 
@@ -13,12 +13,12 @@ To `0 1 * * * cronic backup_cmd`
 Uses the [TOML format](https://toml.io/en/)
 
 ```bash
-mkdir -p ~/.config/chronic/
-cp chronic.conf ~/.config/chronic/chronic.conf
-vim ~/.config/chronic/chronic.conf
+mkdir -p ~/.config/cronic/
+cp cronic.conf ~/.config/cronic/cronic.conf
+vim ~/.config/cronic/cronic.conf
 
 # or set new path with -c
-./cronic -c ./path/chronic.conf echo "hello world"
+./cronic -c ./path/cronic.conf echo "hello world"
 ```
 
 ## Subject and Boady Template
