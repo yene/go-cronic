@@ -22,11 +22,13 @@ vim ~/.config/cronic/cronic.conf
 ```
 
 ## Subject and Boady Template
+Adjust the template with what the problem could be and possible next steps.
+
 Example on how to change them:
 ```toml
 subject="custom subject"
 template="""
-The command had a problem:
+Output for the command:
 {{.Command}}
 RESULT CODE: {{.ResultCode}}
 ERROR OUTPUT:
@@ -36,10 +38,6 @@ STANDARD OUTPUT:
 """
 
 ```
-
-
-## Releae
-`cronic` in this repo is the binary for linux
 
 ## Features and Todo
 - [x] Send stderr per mail
