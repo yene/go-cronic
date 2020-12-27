@@ -6,11 +6,11 @@ From `0 1 * * * backup_cmd >/dev/null 2>&1`
 To `0 1 * * * cronic backup_cmd`
 
 
-
 ![screenshot](shot.png)
 
 ## Configuration
-Uses the [TOML format](https://toml.io/en/)
+You can use Config file or `.env` file or ENV variables (in this order).
+Default config location `~/.config/cronic/cronic.conf` can be changed with `-c`.
 
 ```bash
 mkdir -p ~/.config/cronic/
@@ -20,6 +20,21 @@ vim ~/.config/cronic/cronic.conf
 # or set new path with -c
 ./cronic -c ./path/cronic.conf echo "hello world"
 ```
+
+Environment Variables example:
+```bash
+CRONIC_SMTP_HOST=example.com
+CRONIC_SMTP_PORT=465
+CRONIC_SMTP_USERNAME=usernamess
+CRONIC_SMTP_PASSWORD=Passw0rd!
+CRONIC_SMTP_ENCRYPTION=SSL
+CRONIC_MAIL_SENDER=sender@example.org
+CRONIC_MAIL_RECEIVER=receiver@example.org
+CRONIC_MAIL_SENDSTDOUT=true
+CRONIC_MAIL_SUBJECT=...
+CRONIC_MAIL_TEMPLATE=...
+```
+
 
 ## Subject and Boady Template
 Adjust the template with what the problem could be and possible next steps.

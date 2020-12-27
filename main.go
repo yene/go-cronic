@@ -13,39 +13,10 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/joho/godotenv"
 	"github.com/naoina/toml"
 	mail "github.com/xhit/go-simple-mail"
 )
-
-type TemplateVariables struct {
-	Command        string
-	ResultCode     int
-	ErrorOutput    string
-	StandardOutput string
-	TraceError     string
-}
-
-type TomlConfig struct {
-	Smtp ConfigSMTP `toml:"smtp"`
-	Mail ConfigMail `toml:"mail"`
-}
-
-type ConfigSMTP struct {
-	Host       string `toml:"host"`
-	Port       int    `toml:"port"`
-	Encryption string `toml:"encryption"`
-	Username   string `toml:"username"`
-	Password   string `toml:"password"`
-}
-
-type ConfigMail struct {
-	Sender   string `toml:"sender"`
-	Receiver string `toml:"receiver"`
-	//Subject    string `toml:"subject"`
-	Sendstdout bool   `toml:"sendstdout"`
-	Subject    string `toml:"subject"`
-	Template   string `toml:"template"`
-}
 
 var defaultConfigPath = "~/.config/cronic/cronic.conf"
 
@@ -58,14 +29,21 @@ func main() {
 	if len(args) == 0 {
 		log.Fatalln("Require a command")
 	}
-	log.Println(args)
 
-	dat, err := ioutil.ReadFile(expandTilde(configPath))
-	if err != nil {
-		log.Fatalln(err)
-	}
+	_ = godotenv.Load()
 	config := TomlConfig{}
-	toml.Unmarshal(dat, &config)
+	config.Mail.Template = defaultMailTemplate()
+
+	if fileExists(expandTilde(configPath)) {
+		dat, err := ioutil.ReadFile(expandTilde(configPath))
+		if err != nil {
+			log.Fatalln(err)
+		}
+		toml.Unmarshal(dat, &config)
+		// log.Println("loading config file", expandTilde(configPath))
+	}
+
+	config = LoadFromENV(config)
 
 	var outbuf, errbuf bytes.Buffer
 	var exitCode int = 0
@@ -73,7 +51,7 @@ func main() {
 	commandString := strings.Join(args, " ")
 	cmd.Stdout = &outbuf
 	cmd.Stderr = &errbuf
-	err = cmd.Run()
+	err := cmd.Run()
 	// https://stackoverflow.com/a/55055100/279890
 	if exitError, ok := err.(*exec.ExitError); ok {
 		exitCode = exitError.ExitCode()
@@ -93,13 +71,7 @@ func main() {
 	}
 
 	var tpl bytes.Buffer
-
-	mailTemplate := config.Mail.Template
-	if mailTemplate == "" {
-		mailTemplate = defaultMailTemplate()
-	}
-
-	t := template.Must(template.New("html-tmpl").Parse(mailTemplate))
+	t := template.Must(template.New("html-tmpl").Parse(config.Mail.Template))
 	err = t.Execute(&tpl, data)
 	if err != nil {
 		log.Fatalln(err)
@@ -116,7 +88,7 @@ func main() {
 	server.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 	smtpClient, err := server.Connect()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 
 	sus := commandString
@@ -166,4 +138,9 @@ func convertEncryption(enc string) mail.Encryption {
 	} else {
 		return mail.EncryptionNone
 	}
+}
+
+func fileExists(path string) bool {
+	_, err := os.Stat(path)
+	return !os.IsNotExist(err)
 }
