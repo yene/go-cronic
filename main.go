@@ -3,9 +3,9 @@ package main
 import (
 	"bytes"
 	"crypto/tls"
+	_ "embed"
 	"flag"
 	"html/template"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -15,8 +15,11 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/naoina/toml"
-	mail "github.com/xhit/go-simple-mail"
+	mail "github.com/xhit/go-simple-mail/v2"
 )
+
+//go:embed template.txt
+var defaultMailTemplate string
 
 var defaultConfigPath = "~/.config/cronic/cronic.conf"
 
@@ -32,10 +35,11 @@ func main() {
 
 	_ = godotenv.Load()
 	config := TomlConfig{}
-	config.Mail.Template = defaultMailTemplate()
+
+	config.Mail.Template = defaultMailTemplate
 
 	if fileExists(expandTilde(configPath)) {
-		dat, err := ioutil.ReadFile(expandTilde(configPath))
+		dat, err := os.ReadFile(expandTilde(configPath))
 		if err != nil {
 			log.Fatalln(err)
 		}

@@ -1,0 +1,131 @@
+name: Draft Release
+
+env:
+  NAME: cronic
+  INPUT_VERSION: ${{ github.event.inputs.version }}
+
+# manually trigger in the actions tab
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version'
+        required: true
+        default: '0.1.0'
+
+jobs:
+  build:
+    name: Draft Release
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.16
+
+    - name: Debug
+      run: |
+        go version
+        timedatectl
+    - name: Build Linux
+      run: env GOOS=linux GOARCH=amd64 go build -ldflags "-X main.BuildVersion=$INPUT_VERSION -X main.GitCommit=$GITHUB_SHA" -o ${NAME}-linux
+    - name: UPX Linux
+      uses: crazy-max/ghaction-upx@v1.3.3
+      with:
+        file: ${{env.NAME}}-linux
+
+    - name: Build Linux arm
+      # GOARM=6 (Raspberry Pi A, A+, B, B+, Zero) GOARM=7 (Raspberry Pi 2, 3)
+      run: env GOARM=6 GOOS=linux GOARCH=arm go build -ldflags "-X main.BuildVersion=$INPUT_VERSION -X main.GitCommit=$GITHUB_SHA" -o ${NAME}-linux-arm
+    - name: UPX Linux arm
+      uses: crazy-max/ghaction-upx@v1.3.3
+      with:
+        file: ${{env.NAME}}-linux-arm
+
+    - name: Build macOS amd64
+      run: env GOOS=darwin GOARCH=amd64 go build -ldflags "-X main.BuildVersion=$INPUT_VERSION -X main.GitCommit=$GITHUB_SHA" -o ${NAME}-macos
+    - name: UPX macOS amd64
+      uses: crazy-max/ghaction-upx@v1.3.3
+      with:
+        file: ${{ env.NAME }}-macos
+
+    - name: Build macOS arm64
+      run: env GOOS=darwin GOARCH=arm64 go build -ldflags "-X main.BuildVersion=$INPUT_VERSION -X main.GitCommit=$GITHUB_SHA" -o ${NAME}-macos-arm
+    - name: UPX macOS arm64
+      uses: crazy-max/ghaction-upx@v1.3.3
+      with:
+        file: ${{ env.NAME }}-macos-arm
+
+    - name: Build Windows
+      run: env GOOS=windows GOARCH=amd64 go build -ldflags "-X main.BuildVersion=$INPUT_VERSION -X main.GitCommit=$GITHUB_SHA" -o ${NAME}-windows.exe
+    - name: UPX Windows
+      uses: crazy-max/ghaction-upx@v1.3.3
+      with:
+        file: ${{ env.NAME }}-windows.exe
+
+    # https://github.com/marketplace/actions/tag-and-release
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.event.inputs.version }}
+        release_name: ${{ env.NAME }} ${{ github.event.inputs.version }}
+        body: |
+          Bugfixes and stability improvements.
+        draft: true
+        prerelease: false
+
+    # https://github.com/actions/upload-release-asset
+    - name: Upload Release macOS amd64
+      id: upload-release-asset-macos
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./${{ env.NAME }}-macos
+        asset_name: ${{ env.NAME }}-macos
+        asset_content_type: application/octet-stream
+    - name: Upload Release macOS arm64
+      id: upload-release-asset-macos-arm
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./${{ env.NAME }}-macos-arm
+        asset_name: ${{ env.NAME }}-macos-arm
+        asset_content_type: application/octet-stream
+    - name: Upload Release Linux
+      id: upload-release-asset-linux
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./${{ env.NAME }}-linux
+        asset_name: ${{ env.NAME }}-linux
+        asset_content_type: application/octet-stream
+    - name: Upload Release Linux Arm
+      id: upload-release-asset-linux-arm
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./${{ env.NAME }}-linux-arm
+        asset_name: ${{ env.NAME }}-linux-arm
+        asset_content_type: application/octet-stream
+    - name: Upload Release Windows
+      id: upload-release-asset-windows
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./${{ env.NAME }}-windows.exe
+        asset_name: ${{ env.NAME }}-windows.exe
+        asset_content_type: application/octet-stream
