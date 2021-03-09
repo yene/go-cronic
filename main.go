@@ -22,9 +22,11 @@ import (
 var defaultMailTemplate string
 
 var defaultConfigPath = "~/.config/cronic/cronic.conf"
+var sendStdout = false
 
 func main() {
 	configPathPtr := flag.String("c", defaultConfigPath, "Path to config")
+	configSendStdout := flag.Bool("s", sendStdout, "enable send stdout, use to overwrite config value")
 	flag.Parse()
 	configPath := *configPathPtr
 
@@ -48,6 +50,9 @@ func main() {
 	}
 
 	config = LoadFromENV(config)
+	if *configSendStdout == true && config.Mail.Sendstdout == false {
+		config.Mail.Sendstdout = true
+	}
 
 	var outbuf, errbuf bytes.Buffer
 	var exitCode int = 0
