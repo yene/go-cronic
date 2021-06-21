@@ -1,5 +1,7 @@
-# Go Chonic
-Cronic runs the given command and sends the error output per SMTP mail. If you configure `sendstdout=true` in cronic.conf it also sends a mail on success.
+# go-cronic
+Cronic runs the given command and sends the error per mail. 
+If you configure `sendstdout=true` in cronic.conf it also sends a mail on success.
+The exit code is passed through.
 
 From `0 1 * * * backup_cmd >/dev/null 2>&1`
 
