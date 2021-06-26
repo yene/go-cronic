@@ -1,5 +1,5 @@
 # go-cronic
-Cronic runs the given command and sends the error per mail. 
+Cronic runs the given command and sends the error per mail.
 If you configure `sendstdout=true` in cronic.conf it also sends a mail on success.
 The exit code is passed through.
 
@@ -21,6 +21,9 @@ vim ~/.config/cronic/cronic.conf
 
 # or set new path with -c
 ./cronic -c ./path/cronic.conf echo "hello world"
+
+# validate SMTP config with
+./cronic validate
 ```
 
 Environment Variables example:

@@ -1,2 +1,5 @@
 go-cronic
 .env
+cronic-linux
+cronic-macos
+_*.md

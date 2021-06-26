@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	_ "embed"
+	"errors"
 	"flag"
 	"html/template"
 	"log"
@@ -22,6 +23,7 @@ import (
 var defaultMailTemplate string
 
 var defaultConfigPath = "~/.config/cronic/cronic.conf"
+var validate = false
 
 func main() {
 	configPathPtr := flag.String("c", defaultConfigPath, "Path to config")
@@ -31,6 +33,10 @@ func main() {
 	args := flag.Args()
 	if len(args) == 0 {
 		log.Fatalln("Require a command")
+	}
+
+	if args[0] == "validate" {
+		validate = true
 	}
 
 	_ = godotenv.Load()
@@ -44,7 +50,6 @@ func main() {
 			log.Fatalln(err)
 		}
 		toml.Unmarshal(dat, &config)
-		// log.Println("loading config file", expandTilde(configPath))
 	}
 
 	config = LoadFromENV(config)
@@ -53,13 +58,28 @@ func main() {
 	var exitCode int = 0
 	cmd := exec.Command(args[0], args[1:]...)
 	commandString := strings.Join(args, " ")
+	if validate {
+		commandString = "echo validate"
+	}
+
 	cmd.Stdout = &outbuf
 	cmd.Stderr = &errbuf
 	err := cmd.Run()
-	// https://stackoverflow.com/a/55055100/279890
-	if exitError, ok := err.(*exec.ExitError); ok {
-		exitCode = exitError.ExitCode()
-	} else {
+	// https://stackoverflow.com/a/62647366/279890
+
+	var ee *exec.ExitError
+	var pe *os.PathError
+	if errors.As(err, &ee) {
+		exitCode = ee.ExitCode()
+	} else if errors.As(err, &pe) {
+		// "127 no such file ...", "126 permission denied" etc.
+		exitCode = 1
+	} else if err != nil {
+		// "127 executable file not found in $PATH"
+		exitCode = 1
+	}
+
+	if exitCode == 0 {
 		log.Println("no error")
 		if config.Mail.Sendstdout == false {
 			os.Exit(0)
@@ -93,6 +113,10 @@ func main() {
 	smtpClient, err := server.Connect()
 	if err != nil {
 		log.Fatalln(err)
+	}
+	if validate {
+		log.Println("Succesfully connected to", config.Smtp.Host, config.Smtp.Port)
+		os.Exit(0)
 	}
 
 	sus := commandString
