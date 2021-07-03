@@ -1,18 +1,23 @@
-# go-cronic
-Cronic runs the given command and sends the error per mail.
-If you configure `sendstdout=true` in cronic.conf it also sends a mail on success.
-The exit code is passed through.
+# cronic
+
+> Send crontab results per email.
+
+`cronic` runs the given command and sends errors per mail.
+
 
 From `0 1 * * * backup_cmd >/dev/null 2>&1`
 
-To `0 1 * * * cronic backup_cmd`
+To   `0 1 * * * cronic backup_cmd`
 
 
 ![screenshot](shot.png)
 
 ## Configuration
-You can use Config file or `.env` file or ENV variables (in this order).
-Default config location `~/.config/cronic/cronic.conf` can be changed with `-c`.
+If you configure `sendstdout=true` in cronic.conf it also sends a mail on success.
+The exit code is passed through.
+
+You can specify a config file, `.env` file or ENV variables (in this order).
+Default config location is `~/.config/cronic/cronic.conf`, can be changed with `-c`.
 
 ```bash
 mkdir -p ~/.config/cronic/
@@ -65,8 +70,8 @@ STANDARD OUTPUT:
 - [x] Take path to config from flag
 - [x] Option for TLS/SSL/none
 - [x] Option to always send stdout
-- [ ] Forward stdout/stderr to parent
-- [ ] Inform if a script is not executable (chmod +x)
+- [x] Forward stdout/stderr to parent
+- [x] Inform if a script is not executable (chmod +x)
 
 ## Inspiration
 * https://habilis.net/cronic/
