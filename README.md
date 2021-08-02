@@ -13,9 +13,6 @@ To   `0 1 * * * cronic backup_cmd`
 ![screenshot](shot.png)
 
 ## Configuration
-If you configure `sendstdout=true` in cronic.conf it also sends a mail on success.
-The exit code is passed through.
-
 You can specify a config file, `.env` file or ENV variables (in this order).
 Default config location is `~/.config/cronic/cronic.conf`, can be changed with `-c`.
 
@@ -24,40 +21,40 @@ mkdir -p ~/.config/cronic/
 cp cronic.conf ~/.config/cronic/cronic.conf
 vim ~/.config/cronic/cronic.conf
 
-# or set new path with -c
+# or set new path with -c the order is important!
 ./cronic -c ./path/cronic.conf echo "hello world"
 
 # validate SMTP config with
 ./cronic validate
 ```
+## Sending Email on error and success
+If you configure `sendstdout=true` in cronic.conf it also sends a mail on success.
+The exit code is passed through.
 
-Environment Variables example:
-```bash
-CRONIC_SMTP_HOST=example.com
-CRONIC_SMTP_PORT=465
-CRONIC_SMTP_USERNAME=usernamess
-CRONIC_SMTP_PASSWORD=Passw0rd!
-CRONIC_SMTP_ENCRYPTION=SSL
-CRONIC_MAIL_SENDER=sender@example.org
-CRONIC_MAIL_RECEIVER=receiver@example.org
-CRONIC_MAIL_SENDSTDOUT=true
-CRONIC_MAIL_SUBJECT=...
-CRONIC_MAIL_TEMPLATE=...
-```
-
-
-## Subject and Boady Template
+## Modifying Subject and Boady Template
 Adjust the template with what the problem could be and possible next steps.
 
 Example on how to change them:
 ```toml
-subject="custom subject"
+[smtp]
+host="smtp.office365.com"
+port=587
+username="error@example.org"
+password="..."
+encryption="TLS"
+authentication="Login"
+[mail]
+sender="error@example.org"
+receiver="itteam@example.org"
+subject="Backup Job Failed"
 template="""
-Output for the command:
-{{.Command}}
+If this happens please check cronjob X on machine Y
+
 RESULT CODE: {{.ResultCode}}
+
 ERROR OUTPUT:
 {{.ErrorOutput}}
+
 STANDARD OUTPUT:
 {{.StandardOutput}}
 """
@@ -72,6 +69,10 @@ STANDARD OUTPUT:
 - [x] Option to always send stdout
 - [x] Forward stdout/stderr to parent
 - [x] Inform if a script is not executable (chmod +x)
+
+## Notes on smtp.office365.com
+Username and sender has to be equal.
+The connection uses Encryption TLS and Authentication Login.
 
 ## Inspiration
 * https://habilis.net/cronic/

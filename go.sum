@@ -6,5 +6,5 @@ github.com/naoina/go-stringutil v0.1.0 h1:rCUeRUHjBjGTSHl0VC00jUPLz8/F9dDzYI70Hz
 github.com/naoina/go-stringutil v0.1.0/go.mod h1:XJ2SJL9jCtBh+P9q5btrd/Ylo8XwT/h1USek5+NqSA0=
 github.com/naoina/toml v0.1.1 h1:PT/lllxVVN0gzzSqSlHEmP8MJB4MY2U7STGxiouV4X8=
 github.com/naoina/toml v0.1.1/go.mod h1:NBIhNtsFMo3G2szEBne+bO4gS192HuIYRqfvOWb4i1E=
-github.com/xhit/go-simple-mail/v2 v2.8.0 h1:w6ZDXvRk0EO+r78LRlQl14ngP2tiRDRRHhr9UaVJ0p4=
-github.com/xhit/go-simple-mail/v2 v2.8.0/go.mod h1:kA1XbQfCI4JxQ9ccSN6VFyIEkkugOm7YiPkA5hKiQn4=
+github.com/xhit/go-simple-mail/v2 v2.10.0 h1:nib6RaJ4qVh5HD9UE9QJqnUZyWp3upv+Z6CFxaMj0V8=
+github.com/xhit/go-simple-mail/v2 v2.10.0/go.mod h1:kA1XbQfCI4JxQ9ccSN6VFyIEkkugOm7YiPkA5hKiQn4=

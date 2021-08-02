@@ -110,6 +110,7 @@ func main() {
 	server.Password = config.Smtp.Password
 	server.Encryption = convertEncryption(config.Smtp.Encryption)
 	server.TLSConfig = &tls.Config{InsecureSkipVerify: true}
+	server.Authentication = convertAuthentication(config.Smtp.Authentication)
 	smtpClient, err := server.Connect()
 	if err != nil {
 		log.Fatalln(err)
@@ -165,6 +166,18 @@ func convertEncryption(enc string) mail.Encryption {
 		return mail.EncryptionTLS
 	} else {
 		return mail.EncryptionNone
+	}
+}
+
+func convertAuthentication(enc string) mail.AuthType {
+	if enc == "Login" {
+		return mail.AuthLogin
+	} else if enc == "CRAM-MD5" {
+		return mail.AuthCRAMMD5
+	} else if enc == "None" {
+		return mail.AuthNone
+	} else {
+		return mail.AuthPlain
 	}
 }
 

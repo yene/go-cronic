@@ -18,6 +18,7 @@ func LoadFromENV(c TomlConfig) TomlConfig {
 	c.Smtp.Host = lookupEnv(prefix+"HOST", c.Smtp.Host)
 	c.Smtp.Port = lookupInt(prefix+"PORT", c.Smtp.Port)
 	c.Smtp.Encryption = lookupEnv(prefix+"ENCRYPTION", c.Smtp.Encryption)
+	c.Smtp.Authentication = lookupEnv(prefix+"AUTHENTICATION", c.Smtp.Authentication)
 	c.Smtp.Username = lookupEnv(prefix+"USERNAME", c.Smtp.Username)
 	c.Smtp.Password = lookupEnv(prefix+"PASSWORD", c.Smtp.Password)
 	return c
@@ -37,11 +38,12 @@ type TomlConfig struct {
 }
 
 type ConfigSMTP struct {
-	Host       string `toml:"host"`
-	Port       int    `toml:"port"`
-	Encryption string `toml:"encryption"`
-	Username   string `toml:"username"`
-	Password   string `toml:"password"`
+	Host           string `toml:"host"`
+	Port           int    `toml:"port"`
+	Encryption     string `toml:"encryption"`
+	Authentication string `toml:"authentication"`
+	Username       string `toml:"username"`
+	Password       string `toml:"password"`
 }
 
 type ConfigMail struct {
